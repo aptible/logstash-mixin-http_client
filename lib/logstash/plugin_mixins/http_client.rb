@@ -36,8 +36,15 @@ module LogStash::PluginMixins::HttpClient
     # Turn this on to enable HTTP keepalive support
     config :keepalive, :validate => :boolean, :default => true
 
-    # How many times should the client retry a failing URL? Default is `0`
-    config :automatic_retries, :validate => :number, :default => 0
+    # How many times should the client retry a failing URL?
+    config :automatic_retries, :validate => :number, :default => 1
+
+    # Retry non-idempotent reqursts, including POSTs.
+    config :retry_non_idempotent, :validate => :boolean, :default => true
+
+    # Enable stale checks in Manticore. This degrades performance slightly,
+    # but ensures we don't reuse connections that were closed..!
+    config :stale_check, :validate => :boolean, :default => true
 
     # Set this to false to disable SSL/TLS certificate validation
     # Note: setting this to false is generally considered insecure!
@@ -81,6 +88,8 @@ module LogStash::PluginMixins::HttpClient
       request_timeout: @request_timeout,
       follow_redirects: @follow_redirects,
       automatic_retries: @automatic_retries,
+      retry_non_idempotent: @retry_non_idempotent,
+      stale_check: @stale_check,
       pool_max: @pool_max,
       pool_max_per_route: @pool_max_per_route,
       cookies: @cookies,
